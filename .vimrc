@@ -52,7 +52,10 @@ call plug#begin()
     Plug 'octol/vim-cpp-enhanced-highlight'
 
     " Color Schemes
-    Plug 'flazz/vim-colorschemes'
+    Plug 'flazz/vim-colorschemes'   
+
+    " Side bar that shows tags
+    Plug 'majutsushi/tagbar'
 
     " Shows git changes near the line number
     if vim_version >= 704
@@ -173,13 +176,18 @@ autocmd VimEnter * nmap <F2> :NERDTreeToggle<CR>
 autocmd VimEnter * imap <F2> <Esc>:NERDTreeToggle<CR>a
 
 " --- F3 ---
-" Shows a listing of open buffers
-map <F3> :Buffers<CR>
+" Toggles tagbar
+nmap <F3> :TagbarToggle<CR>
 
 " --- F4 ---
+" Shows a listing of open buffers
+nmap <F4> :Buffers<CR>
+
+
+" --- F5 ---
 " Shows a listing of all changes in git.
 if has_fzf_suite > 0
-    map <F4> :GFiles?<CR>
+    map <F5> :GFiles?<CR>
 endif
 
 " --- F9 ---
@@ -478,7 +486,9 @@ inoremap (      ()<Left>
 inoremap ()     ()
 
 
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+let &t_SI = "\<Esc>[6 q"
+let &t_SR = "\<Esc>[4 q"
+let &t_EI = "\<Esc>[2 q"
 " => Multi-Use Functions 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
