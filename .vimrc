@@ -162,6 +162,12 @@ if has_ycm > 0
     nnoremap <C-p> :YcmCompleter GoToDefinitionElseDeclaration<CR>
 endif
 
+" --- Ctrl-s ---
+" Smart substitution
+nmap <C-s> :%s/\<<C-r><C-w>\>//gc<Left><Left><Left>
+" In visual mode, highlighted word is selected for replacement
+vnoremap <C-s> "hy:%s/<C-r>h//gc<left><left><left>
+
 " --- Ctrl-p-p ---
 " CTags, using ctags generated with f12.
 map <C-p><C-p> <c-]>
@@ -208,12 +214,6 @@ command W w !sudo tee % > /dev/null
 " Show function name below status bar.  See function for more details.
 map <C-f> :call ShowFunctionName() <CR>
 
-" --- Ctrl-r ---
-" In visual mode, will do a find and replace, with prompts.
-" In short: highlight a word you wish to find and replace, press ctrl-r,
-"           then type in the you wish to replace it with and press enter.
-" https://stackoverflow.com/questions/676600/vim-search-and-replace-selected-text
-vnoremap <C-r> "hy:%s/<C-r>h//gc<left><left><left>
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => VIM user interface
@@ -367,12 +367,14 @@ set list lcs=tab:\|\
 set lbr
 set tw=500
 
+
 set ai "Auto indent
 set si "Smart indent
 
 " do c-style indenting
 set cindent 
-
+set cinoptions=g-1
+"
 " Personal preference for line wrapping:
 " set wrap
 set nowrap

@@ -1,0 +1,30 @@
+[filter "lfs"]
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true
+[user]
+	email = ahuh@atxnetworks.com
+	name = Andrew Huh
+[alias]
+	ls = log --pretty=format:"%C(yellow)%h%Cred%d\\ %Creset%s%Cblue\\ [%cn]" --decorate --numstat
+	ld = log --pretty=format:"%C(yellow)%h\\ %C(green)%ad%Cred%d\\ %Creset%s%Cblue\\ [%cn]" --decorate --date=short --graph
+	lgc = log --pretty=format:"%C(green)%h\\ %C(yellow)[%ad]%Cred%d\\ %Creset%s%Cblue\\ [%cn]" --decorate --date=short --graph
+	lg = log --decorate --graph 	
+    st = status
+    
+    dtu = difftool  
+    dts = difftool --cached
+    dta = difftool HEAD
+    du  = diff 
+    ds  = diff --cached
+    da  = diff HEAD 
+    
+    cm  = commit -m 
+
+[push]
+	default = simple
+[diff]
+	tool = meld
+[merge]
+    tool = meld
