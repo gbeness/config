@@ -49,6 +49,8 @@ alias ll='ls -alF'
 alias la='ls -A'
 alias l='ls -CF'
 
+# disable caps lock
+setxkbmap -option caps:none
 
 # Show colors in less
 alias less='less -R'

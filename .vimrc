@@ -475,7 +475,10 @@ nnoremap        <C-e>       :confirm bdelete<CR>
 
 nnoremap        L       gt
 nnoremap        H       gT
-
+nnoremap        K       <Nop>
+nnoremap        J       <Nop>
+vnoremap        K       <Nop>
+vnoremap        J       <Nop>
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => C/C++ 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
