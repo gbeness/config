@@ -11,8 +11,9 @@
 	ld = log --pretty=format:"%C(yellow)%h\\ %C(green)%ad%Cred%d\\ %Creset%s%Cblue\\ [%cn]" --decorate --date=short --graph
 	lgc = log --pretty=format:"%C(green)%h\\ %C(yellow)[%ad]%Cred%d\\ %Creset%s%Cblue\\ [%cn]" --decorate --date=short --graph
 	lg = log --decorate --graph 	
+    la = log --decorate --graph --all
     st = status
-    
+    addall = add --all    
     dtu = difftool  
     dts = difftool --cached
     dta = difftool HEAD
