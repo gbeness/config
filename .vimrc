@@ -187,14 +187,14 @@ nmap <F3> :TagbarToggle<CR>
 
 " --- F4 ---
 " Shows a listing of open buffers
-nmap <F4> :Buffers<CR>
+nmap <F4> :Gblame<CR>
 
 
 " --- F5 ---
 " Shows a listing of all changes in git.
-if has_fzf_suite > 0
-    map <F5> :GFiles?<CR>
-endif
+"if has_fzf_suite > 0
+"    map <F5> :GFiles?<CR>
+"endif
 
 " --- F9 ---
 " clang-format, for file formatting auto-correction.
@@ -475,11 +475,12 @@ nnoremap        <C-e>       :confirm bdelete<CR>
 
 nnoremap        L       gt
 nnoremap        H       gT
+
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => C/C++ 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 inoremap {      {}<Left>
-inoremap {<CR>  {<CR>}<Esc>O
+inoremap {<CR>  {<CR>}<Esc>
 inoremap {{     {
 inoremap {}     {}  
 
@@ -487,10 +488,6 @@ inoremap [      []<Left>
 inoremap (      ()<Left>
 inoremap ()     ()
 
-
-let &t_SI = "\<Esc>[6 q"
-let &t_SR = "\<Esc>[4 q"
-let &t_EI = "\<Esc>[2 q"
 " => Multi-Use Functions 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
