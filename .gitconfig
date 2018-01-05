@@ -13,14 +13,14 @@
 	lg = log --decorate --graph 	
     la = log --decorate --graph --all
     st = status
-    addall = add --all    
+    aa = add --all    
     dtu = difftool  
     dts = difftool --cached
     dta = difftool HEAD
     du  = diff 
     ds  = diff --cached
     da  = diff HEAD 
-    
+    smu = submodule update --recursive --init 
     cm  = commit -m 
 
 [push]
