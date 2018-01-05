@@ -97,7 +97,7 @@ highlight link NERDTreeExecFile ModeMsg
 " The program searches for the .ycm_extra_conf.py file on startup in the current source file directory and in its parent folders.
 " If the file is not found, YCM features are not available. A global file (used as fallback when a local extra conf file is not found) may be set.
 let g:ycm_global_ycm_extra_conf = '~/.vim/.ycm_extra_conf.py'
-
+let g:ycm_collect_identifiers_from_tags_files = 1
 " cpp enhanced highlight
 let g:cpp_class_scope_highlight = 1
 let g:cpp_member_variable_highlight = 1
@@ -113,7 +113,7 @@ let g:NERDTreeDirArrows = 1
 let g:NERDTreeDirArrowExpandable = '▸'
 let g:NERDTreeDirArrowCollapsible = '▾'
 let g:NERDTreeGlyphReadOnly = "RO"
-
+let g:NERDTreeShowHidden = 1
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " User setting
@@ -388,7 +388,7 @@ map         <F12>       :!find . -type f -name '*.cpp' -o -name '*.c'
                                                       \-o -name '*.sh' 
                                                       \\| ctags -L - 
                                                       \--c++-kinds=+p 
-                                                      \--fields=+iaS 
+                                                      \--fields=+liaS 
                                                       \--extra=+q<CR><CR>
 
 " --- :W ---
@@ -432,8 +432,8 @@ nmap        df          <Del>
 nnoremap    d           "_d
 nnoremap    <Del>       "_d<Right>
 " Use jj as Escape
-imap        jj          <Esc>
-vmap        jj          <Esc>
+imap        ;;          <Esc>
+vmap        ;;          <Esc>
 "=============================================
 " Braces
 "=============================================
