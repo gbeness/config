@@ -427,11 +427,13 @@ map         0           ^
 map         -           $
 
 " delete remapped to df
-nnoremap    df          "_d<Right>
+nmap        df          <Del>
 " Stop delete from putting the deleted text into the clipboard
 nnoremap    d           "_d
 nnoremap    <Del>       "_d<Right>
-
+" Use jj as Escape 
+imap        jj          <Esc>
+vmap        jj          <Esc>
 "=============================================
 " Braces
 "=============================================
