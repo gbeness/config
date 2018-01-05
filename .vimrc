@@ -431,7 +431,7 @@ nmap        df          <Del>
 " Stop delete from putting the deleted text into the clipboard
 nnoremap    d           "_d
 nnoremap    <Del>       "_d<Right>
-" Use jj as Escape 
+" Use jj as Escape
 imap        jj          <Esc>
 vmap        jj          <Esc>
 "=============================================
@@ -487,11 +487,13 @@ nnoremap <silent> <leader>tw
     \   echo "Whitespace Highlighting: on" <Bar>
     \ endif<CR>
 
+" Deletes trailing whitespace in current line
+nnoremap <silent> <leader>dt :s/\s\+$//ge<CR>
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Multi-Use Functions
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Show the current function you are in right below the status bar.
+" Show the current function you are in right below the status bar
 fun! ShowFunctionName()
     echohl ModeMsg
     call GetFuncName()
