@@ -38,9 +38,6 @@ PS1=$(build_ps1)
 PS2='\\ '
 PS4='+ $LINENO: '
 
-# }}}
-
-# ## Aliases {{{
 # Colorize `ls`.
 alias ls='ls --color=always'
 
@@ -52,6 +49,10 @@ alias l='ls -CF'
 # disable caps lock
 setxkbmap -option caps:none
 
+# bind C-O to C-N
+bind '"\C-o": "\C-n"'
+bind '"\C-p": history-search-backward'
+bind '"\C-o": history-search-forward'
 # Show colors in less
 alias less='less -R'
 
@@ -59,10 +60,8 @@ alias less='less -R'
 export GREP_COLORS="1;33"
 alias grep='grep --color=auto'
 
-
 #so as not to be disturbed by Ctrl-S ctrl-Q in terminals:
 stty -ixon
-
 
 #getting vim color schemes to work
 export TERM=screen-256color
@@ -79,12 +78,6 @@ alias tmuxnew='tmux new -s'
 
 # Lists all ongoing sessions
 alias tmuxlist='tmux list-sessions'
-
-# The next line updates PATH for the Google Cloud SDK.
-if [ -f '/home/$USER/google-cloud-sdk/path.bash.inc' ]; then source '/home/rmoe/google-cloud-sdk/path.bash.inc'; fi
-
-# The next line enables shell command completion for gcloud.
-if [ -f '/home/$USER/google-cloud-sdk/completion.bash.inc' ]; then source '/home/rmoe/google-cloud-sdk/completion.bash.inc'; fi
 
 # Don't let nautilus write recently used items here, as this seems to kill nautilus when sshfs goes down.
 [ -f ~/.local/share/recently-used.xbel ] && chmod 400 ~/.local/share/recently-used.xbel
