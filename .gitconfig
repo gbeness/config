@@ -22,7 +22,9 @@
     da  = diff HEAD 
     smu = submodule update --recursive --init 
     cm  = commit -m 
-
+    ci = commit -v
+    co = checkout
+    br = branch
 [push]
 	default = simple
 [diff]

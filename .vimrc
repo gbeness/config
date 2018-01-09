@@ -123,9 +123,9 @@ let g:NERDTreeShowHidden = 1
 "=============================================
 " Enable filetype detection
 filetype on
-" Will keep hidden buffers open until user specifies 
+" Will keep hidden buffers open until user specifies
 set hid
-" If closing a buffer with unsaved changes, vim confirms 
+" If closing a buffer with unsaved changes, vim confirms
 set confirm
 " Sets how many lines of history VIM has to remember
 set history=500
@@ -159,7 +159,7 @@ if vim_version >= 704
 endif
 
 "=============================================
-" Searches/Autocomplete and highlighting 
+" Searches/Autocomplete and highlighting
 "=============================================
 " Ignore case when searching
 set ignorecase
@@ -235,7 +235,6 @@ set cinoptions=g-1
 " Shows tabs when using tab indentation.
 " Note: Do not remove the space at the end of the command
 set list lcs=tab:\|\ 
-
 
 "=============================================
 " Line related 
@@ -366,7 +365,6 @@ nmap        <F3>        :TagbarToggle<CR>
 nmap        <F4>        :Gblame<CR>
 
 " --- F5 ---
-" Shows a listing of all changes in git.
 "if has_fzf_suite > 0
 "    map <F5> :GFiles?<CR>
 "endif
@@ -431,7 +429,9 @@ nmap        df          <Del>
 " Stop delete from putting the deleted text into the clipboard
 nnoremap    d           "_d
 nnoremap    <Del>       "_d<Right>
-" Use jj as Escape
+" Alternatives to Escape
+imap        jj          <Esc>
+vmap        jj          <Esc>
 imap        ;;          <Esc>
 vmap        ;;          <Esc>
 "=============================================
@@ -475,6 +475,13 @@ nnoremap    J           <Nop>
 vnoremap    K           <Nop>
 vnoremap    J           <Nop>
 
+" Jumps to git changes
+nmap        <silent> <leader>jt        <Plug>GitGutterNextHunk
+nmap        <silent> <leader>jT        <Plug>GitGutterPrevHunk
+
+"=============================================
+" Braces
+"=============================================
 " Toggles highlighting for trailing whitespaces
 highlight ExtraWhitespace ctermbg=lightred guibg=lightred
 nnoremap <silent> <leader>tw
@@ -488,7 +495,7 @@ nnoremap <silent> <leader>tw
     \ endif<CR>
 
 " Deletes trailing whitespace in current line
-nnoremap <silent> <leader>dt :s/\s\+$//ge<CR>
+nnoremap <silent> <leader>ds :s/\s\+$//ge<CR>
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Multi-Use Functions
