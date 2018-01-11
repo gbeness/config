@@ -47,7 +47,7 @@ alias la='ls -A'
 alias l='ls -CF'
 
 # disable caps lock
-setxkbmap -option caps:none
+xmodmap -e "keycode 66 = Escape NoSymbol Escape" 
 
 # bind C-O to C-N
 bind '"\C-o": "\C-n"'

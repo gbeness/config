@@ -340,58 +340,70 @@ command! -nargs=+ FindC :execute  'silent grep -Rinl --include=\*.{c,cc,cpp,cxx,
 command! -nargs=+ Grep  :execute  'silent grep -RIin . -e <args>' | copen | execute ':redraw!'
 command! -nargs=+ Find  :execute  'silent grep -RIinl . -e <args>' | copen | execute ':redraw!'
 
+" --- :W ---
+" will SUDO save the file
+command W w !sudo tee % > /dev/null
+
 " --- :VReplace ---
 " WIP
 "command! -nargs=* VReplace :"hy:%s/<C-r>h//gc<left><left><left>
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Custom Key Mappings
+" Custom leader mapping 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " --- SpaceBar ---
 " Search though all commands available to you.  Very handy!
 if has_fzf_suite > 0
-    map <space> :Commands<CR>
+    map     <space>                  :Commands<CR>
 endif
 
-" --- F2 ---
-" toggle and untogle Nerdtree
-autocmd VimEnter * nmap <F2> :NERDTreeToggle<CR>
-autocmd VimEnter * imap <F2> <Esc>:NERDTreeToggle<CR>a
-" --- F3 ---
-" Toggles tagbar
-nmap        <F3>        :TagbarToggle<CR>
-" --- F4 ---
-" Shows the change history
-nmap        <F4>        :Gblame<CR>
+" toggle and untoggle Nerdtree
+autocmd VimEnter * nmap <silent><leader>nt :NERDTreeToggle<CR>
+autocmd VimEnter * imap <silent><leader>nt <Esc>:NERDTreeToggle<CR>a
 
-" --- F5 ---
+" Toggles tagbar
+map        <silent><leader>tb        :TagbarToggle<CR>
+
+" Shows the change history
+nmap       <silent><leader>gb        :Gblame<CR>
+
 "if has_fzf_suite > 0
 "    map <F5> :GFiles?<CR>
 "endif
 
-" --- F9 ---
 " clang-format, for file formatting auto-correction.
-map         <F9>        :pyf ~/bin/clang-format.py<cr>
-imap        <F9>        <c-o>:pyf ~/bin/clang-format.py<cr>
+"map         <F9>        :pyf ~/bin/clang-format.py<cr>
+"imap        <F9>        <c-o>:pyf ~/bin/clang-format.py<cr>
 
-" --- F12 ---
-" will regenerate a tag file.
-map         <F12>       :!find . -type f -name '*.cpp' -o -name '*.c' 
-                                                      \-o -name '*.cxx' 
-                                                      \-o -name '*.h' 
-                                                      \-o -name '*.hpp' 
-                                                      \-o -name '*.hxx' 
-                                                      \-o -name '*.cc' 
-                                                      \-o -name '*.py' 
-                                                      \-o -name '*.sh' 
-                                                      \\| ctags -L - 
-                                                      \--c++-kinds=+p 
-                                                      \--fields=+liaS 
-                                                      \--extra=+q<CR><CR>
+" will regenerate a tag filea
+map         <silent><leader>tag       :!find . -type f -name '*.cpp' -o -name '*.c' 
+                                                                    \-o -name '*.cxx' 
+                                                                    \-o -name '*.h' 
+                                                                    \-o -name '*.hpp' 
+                                                                    \-o -name '*.hxx' 
+                                                                    \-o -name '*.cc' 
+                                                                    \-o -name '*.py' 
+                                                                    \-o -name '*.sh' 
+                                                                    \\| ctags -L - 
+                                                                    \--c++-kinds=+p 
+                                                                    \--fields=+liaS 
+                                                                    \--extra=+q<CR><CR>
 
-" --- :W ---
-" will SUDO save the file
-command W w !sudo tee % > /dev/null
+
+" Toggles highlighting for trailing whitespaces
+highlight ExtraWhitespace ctermbg=lightred guibg=lightred
+nnoremap <silent> <leader>tw
+    \ :if exists('w:trailing_whitespace_match') <Bar>
+    \   silent! call matchdelete(w:trailing_whitespace_match) <Bar>
+    \   unlet w:trailing_whitespace_match <Bar>
+    \   echo "Whitespace Highlighting: off" <Bar>
+    \ else <Bar>
+    \   let w:trailing_whitespace_match = matchadd('ExtraWhitespace', '\s\+\%#\@<!$', -1) <Bar>
+    \   echo "Whitespace Highlighting: on" <Bar>
+    \ endif<CR>
+
+" Deletes trailing whitespace in current line
+nnoremap <silent><leader>ds :s/\s\+$//ge<CR>
 
 " --- Ctrl-f ---
 " Show function name below status bar.  See function for more details.
@@ -429,11 +441,6 @@ nmap        df          <Del>
 " Stop delete from putting the deleted text into the clipboard
 nnoremap    d           "_d
 nnoremap    <Del>       "_d<Right>
-" Alternatives to Escape
-imap        jj          <Esc>
-vmap        jj          <Esc>
-imap        ;;          <Esc>
-vmap        ;;          <Esc>
 "=============================================
 " Braces
 "=============================================
@@ -479,23 +486,6 @@ vnoremap    J           <Nop>
 nmap        <silent> <leader>jt        <Plug>GitGutterNextHunk
 nmap        <silent> <leader>jT        <Plug>GitGutterPrevHunk
 
-"=============================================
-" Braces
-"=============================================
-" Toggles highlighting for trailing whitespaces
-highlight ExtraWhitespace ctermbg=lightred guibg=lightred
-nnoremap <silent> <leader>tw
-    \ :if exists('w:trailing_whitespace_match') <Bar>
-    \   silent! call matchdelete(w:trailing_whitespace_match) <Bar>
-    \   unlet w:trailing_whitespace_match <Bar>
-    \   echo "Whitespace Highlighting: off" <Bar>
-    \ else <Bar>
-    \   let w:trailing_whitespace_match = matchadd('ExtraWhitespace', '\s\+\%#\@<!$', -1) <Bar>
-    \   echo "Whitespace Highlighting: on" <Bar>
-    \ endif<CR>
-
-" Deletes trailing whitespace in current line
-nnoremap <silent> <leader>ds :s/\s\+$//ge<CR>
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Multi-Use Functions
