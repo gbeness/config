@@ -46,14 +46,8 @@ alias ll='ls -alF'
 alias la='ls -A'
 alias l='ls -CF'
 
-# disable caps lock
 xmodmap -e "keycode 66 = Escape NoSymbol Escape" 
 
-# bind C-O to C-N
-bind '"\C-o": "\C-n"'
-bind '"\C-p": history-search-backward'
-bind '"\C-o": history-search-forward'
-# Show colors in less
 alias less='less -R'
 
 # Colorize `grep`.

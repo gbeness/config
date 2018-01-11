@@ -1,0 +1,20 @@
+# Local inputrc
+#
+set colored-stats on
+set completion-ignore-case On
+
+# Up and Down will look autocomplete seach history
+"\e[A": history-search-backward
+"\e[B": history-search-forward
+# Ctr-p and Ctr-o mapped to up and down arrows
+"\C-p": "\e[A"
+"\C-o": "\e[B"
+# Alt-hjkl to arrows
+"\e\e[D": "\e[D"
+"\e\e[B": "\e[B"
+"\e\e[A": "\e[A" 
+"\e\e[C": "\e[C"
+
+# if more key maps are needed cat > /dev/null and type keys
+# and echos bit representation. can then type it here
+
