@@ -94,8 +94,6 @@ call plug#end()
 " Don't highlight any executables in NERDTree.
 highlight link NERDTreeExecFile ModeMsg
 
-" The program searches for the .ycm_extra_conf.py file on startup in the current source file directory and in its parent folders.
-" If the file is not found, YCM features are not available. A global file (used as fallback when a local extra conf file is not found) may be set.
 let g:ycm_global_ycm_extra_conf = '~/.vim/.ycm_extra_conf.py'
 let g:ycm_collect_identifiers_from_tags_files = 1
 " cpp enhanced highlight
@@ -171,9 +169,6 @@ set hlsearch
 set incsearch
 " For regular expressions turn magic on
 set magic
-" This will differentiate between searched-text and text under the cursor.
-hi Search ctermbg=DarkGreen
-hi Search ctermfg=LightYellow
 " This is the command auto-completion bar that appears
 set wildmenu
 " Autocomplete menu color seting
@@ -198,22 +193,20 @@ autocmd InsertEnter,InsertLeave * set cul!
 "=============================================
 "  Colors and Fonts
 "=============================================
-" Getting the most colors available.  Drop back to 'xterm' if you have issues.
 if running_tmux >= 1
+    " Getting the most colors available.  Drop back to 'xterm' if you have issues.
     set term=screen-256color
     "set term=xterm-256color
+    " Using this to get VIM non-black backgrounds to work in tmux
+    set t_ut=
 else
     set term=xterm-256color
 endif
 
 " https://github.com/flazz/vim-colorschemes/tree/master/colors
 colorscheme despacio
-
-" Disable Background Color Erase'
-" Using this to get VIM non-black backgrounds to work in tmux properly.
-if running_tmux >= 1
-    set t_ut=
-endif
+" Highlight Search
+hi Search ctermbg=LightYellow guibg=LightYellow
 
 "=============================================
 " Text, tab and indent related
@@ -228,7 +221,7 @@ set tabstop=4
 " Auto indent
 set ai
 " Smart indent
-set si 
+set si
 " do c-style indenting
 set cindent
 set cinoptions=g-1
@@ -237,7 +230,7 @@ set cinoptions=g-1
 set list lcs=tab:\|\ 
 
 "=============================================
-" Line related 
+" Line related
 "=============================================
 " Linebreak on 500 characters
 set lbr
@@ -251,7 +244,7 @@ set whichwrap+=<,>,h,l,[,],
 " Line number on the side
 set number
 " Number of lines cursor moves before scrolling
-set so=1
+set so=20
 
 "=============================================
 " Status line
@@ -266,29 +259,29 @@ set showcmd
 set statusline=%<%f\ %h%m%r%y%=%-20.(%l/%L,%c%V%)\ %P
 
 "=============================================
-" Copy/Paste 
+" Copy/Paste
 "=============================================
 " Use linux system clipboard instead of VIMs
 " https://stackoverflow.com/questions/3961859/how-to-copy-to-clipboard-invim
 set clipboard=unnamedplus
 
 " Automatically paste from the system clipboard
-" no more needing to ":set paste" before you paste:
+" no more needing to ':set paste' before you paste:
 " https://coderwall.com/p/if9mda/automatically-set-paste-mode-in-vim-when-pasting-in-insert-mode
 function! WrapForTmux(s)
-  if !exists('$TMUX')
-    return a:s
-  endif
-  let tmux_start = "\<Esc>Ptmux;"
-  let tmux_end = "\<Esc>\\"
-  return tmux_start . substitute(a:s, "\<Esc>", "\<Esc>\<Esc>", 'g') . tmux_end
+    if !exists('$TMUX')
+        return a:s
+    endif
+    let tmux_start = "\<Esc>Ptmux;"
+    let tmux_end = "\<Esc>\\"
+    return tmux_start . substitute(a:s, "\<Esc>", "\<Esc>\<Esc>", 'g') . tmux_end
 endfunction
 let &t_SI .= WrapForTmux("\<Esc>[?2004h")
 let &t_EI .= WrapForTmux("\<Esc>[?2004l")
 function! XTermPasteBegin()
-  set pastetoggle=<Esc>[201~
-  set paste
-  return ""
+    set pastetoggle=<Esc>[201~
+    set paste
+    return ""
 endfunction
 inoremap <special> <expr> <Esc>[200~ XTermPasteBegin()
 
@@ -312,7 +305,6 @@ set ttymouse=xterm2
 
 " Dont have that stupid preview 'scratch' window thing
 set completeopt-=preview
-
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Custom Commands
@@ -349,23 +341,25 @@ command W w !sudo tee % > /dev/null
 "command! -nargs=* VReplace :"hy:%s/<C-r>h//gc<left><left><left>
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Custom leader mapping 
+" Custom leader mapping
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " --- SpaceBar ---
 " Search though all commands available to you.  Very handy!
 if has_fzf_suite > 0
-    map     <space>                  :Commands<CR>
+    map     <space>                 :Commands<CR>
 endif
 
 " toggle and untoggle Nerdtree
-autocmd VimEnter * nmap <silent><leader>nt :NERDTreeToggle<CR>
-autocmd VimEnter * imap <silent><leader>nt <Esc>:NERDTreeToggle<CR>a
-
+nnoremap    <silent><leader>nt      :NERDTreeToggle<CR>
+inoremap    <silent><leader>nt <Esc>:NERDTreeToggle<CR>a
 " Toggles tagbar
-map        <silent><leader>tb        :TagbarToggle<CR>
-
+map         <silent><leader>tb      :TagbarToggle<CR>
 " Shows the change history
-nmap       <silent><leader>gb        :Gblame<CR>
+nmap        <silent><leader>gb      :Gblame<CR>
+
+" Jumps to git changes
+nmap        <silent><leader>jt      <Plug>GitGutterNextHunk
+nmap        <silent><leader>jT      <Plug>GitGutterPrevHunk
 
 "if has_fzf_suite > 0
 "    map <F5> :GFiles?<CR>
@@ -376,18 +370,18 @@ nmap       <silent><leader>gb        :Gblame<CR>
 "imap        <F9>        <c-o>:pyf ~/bin/clang-format.py<cr>
 
 " will regenerate a tag filea
-map         <silent><leader>tag       :!find . -type f -name '*.cpp' -o -name '*.c' 
-                                                                    \-o -name '*.cxx' 
-                                                                    \-o -name '*.h' 
-                                                                    \-o -name '*.hpp' 
-                                                                    \-o -name '*.hxx' 
-                                                                    \-o -name '*.cc' 
-                                                                    \-o -name '*.py' 
-                                                                    \-o -name '*.sh' 
-                                                                    \\| ctags -L - 
-                                                                    \--c++-kinds=+p 
-                                                                    \--fields=+liaS 
-                                                                    \--extra=+q<CR><CR>
+map         <silent><leader>tag     :!find . -type f -name '*.cpp' -o -name '*.c' 
+                                                                  \-o -name '*.cxx' 
+                                                                  \-o -name '*.h' 
+                                                                  \-o -name '*.hpp' 
+                                                                  \-o -name '*.hxx' 
+                                                                  \-o -name '*.cc' 
+                                                                  \-o -name '*.py' 
+                                                                  \-o -name '*.sh' 
+                                                                  \\| ctags -L - 
+                                                                  \--c++-kinds=+p 
+                                                                  \--fields=+liaS 
+                                                                  \--extra=+q<CR><CR>
 
 
 " Toggles highlighting for trailing whitespaces
@@ -405,27 +399,31 @@ nnoremap <silent> <leader>tw
 " Deletes trailing whitespace in current line
 nnoremap <silent><leader>ds :s/\s\+$//ge<CR>
 
-" --- Ctrl-f ---
+" Toggles word under cursor matching
+hi SearchPattern ctermbg=LightYellow guibg=LightYellow
+nnoremap <silent> <leader>m
+    \ :if exists('w:pattern_match') <Bar>
+    \   silent! call matchdelete(w:pattern_match) <Bar>
+    \   unlet w:pattern_match <Bar>
+    \   echo "match lighting: off" <bar>
+    \ else <Bar>
+    \   silent! let w:pattern_match = matchadd('SearchPattern', '\<<C-r><C-w>\>', -1) <Bar>
+    \   echo "match lighting: on" <Bar>
+    \ endif<CR>
+
 " Show function name below status bar.  See function for more details.
 map         <C-f>       :call ShowFunctionName() <CR>
-
-" --- Ctrl-s ---
 " Substitution in command mode
-nmap        <C-s>       :%s/\<<C-r><C-w>\>//gc<Left><Left><Left>
+nnoremap    <C-s>       :%s/\<<C-r><C-w>\>//gc<Left><Left><Left>
 " In visual mode, highlighted word is selected for replacement
 vnoremap    <C-s>       "hy:%s/<C-r>h//gc<Left><Left><Left>
 
-" --- Ctrl-p ---
 " YouCompleteMe jumping function
 if has_ycm > 0
     nnoremap <C-p>      :YcmCompleter GoToDefinitionElseDeclaration<CR>
 endif
-
-" --- Ctrl-p-p ---
 " CTags, using ctags generated with f12.
 map         <C-p><C-p> <c-]>
-
-" --- Ctrl-p-p-p ---
 " Custom GREP search results, Third level of Ctrl-p-p-p.
 nmap        <C-p><C-p><C-p> :GrepC <c-r>=expand("<cword>")<cr><cr>
 
@@ -481,11 +479,6 @@ nnoremap    K           <Nop>
 nnoremap    J           <Nop>
 vnoremap    K           <Nop>
 vnoremap    J           <Nop>
-
-" Jumps to git changes
-nmap        <silent> <leader>jt        <Plug>GitGutterNextHunk
-nmap        <silent> <leader>jT        <Plug>GitGutterPrevHunk
-
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Multi-Use Functions
