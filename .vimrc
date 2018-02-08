@@ -87,8 +87,8 @@ call plug#begin()
     " A better way of 'marking' aka file bookmarks.
     Plug 'MattesGroeger/vim-bookmarks'
 
-    " HIDDEN PLUGIN - there is a non-github plugin to show the nerdtree grep menu item, located in the 'after' folder.
-
+    Plug 'git@github.com:gbeness/substitution_nerdtree.git'
+    Plug 'git@github.com:gbeness/grep_nerdtree.git'
 call plug#end()
 
 " Don't highlight any executables in NERDTree.
@@ -155,6 +155,7 @@ endif
 if vim_version >= 704
     set fileignorecase
 endif
+autocmd BufEnter *.tpp :setlocal filetype=cpp 
 
 "=============================================
 " Searches/Autocomplete and highlighting
@@ -327,8 +328,8 @@ endif
 
 " --- Grep Commands ---
 " opens search results in a window w/ links and highlight the matches, for the word under the cursor
-command! -nargs=+ GrepC :execute  'silent grep -Rin --include=\*.{c,cc,cpp,cxx,h,hpp,hxx} . -e <args>' | copen | execute ':redraw!'
-command! -nargs=+ FindC :execute  'silent grep -Rinl --include=\*.{c,cc,cpp,cxx,h,hpp,hxx} . -e <args>' | copen | execute ':redraw!'
+command! -nargs=+ GrepC :execute  'silent grep -Rin --include=\*.{c,cc,cpp,tpp,cxx,h,hpp,hxx} . -e <args>' | copen | execute ':redraw!'
+command! -nargs=+ FindC :execute  'silent grep -Rinl --include=\*.{c,cc,cpp,tpp,cxx,h,hpp,hxx} . -e <args>' | copen | execute ':redraw!'
 command! -nargs=+ Grep  :execute  'silent grep -RIin . -e <args>' | copen | execute ':redraw!'
 command! -nargs=+ Find  :execute  'silent grep -RIinl . -e <args>' | copen | execute ':redraw!'
 
@@ -444,7 +445,7 @@ nnoremap    <Del>       "_d<Right>
 "=============================================
 " autocompletes braces
 inoremap    {           {}<Left>
-inoremap    {<CR>       {<CR>}<Esc>
+inoremap    {<CR>       {<CR>}<Up>
 inoremap    {{          {
 inoremap    {}          {}
 
