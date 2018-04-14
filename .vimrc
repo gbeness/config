@@ -113,6 +113,22 @@ let g:NERDTreeDirArrowCollapsible = '▾'
 let g:NERDTreeGlyphReadOnly = "RO"
 let g:NERDTreeShowHidden = 1
 
+" Check if NERDTree is open or active
+function! IsNERDTreeOpen()        
+  return exists("t:NERDTreeBufName") && (bufwinnr(t:NERDTreeBufName) != -1)
+endfunction
+
+" Call NERDTreeFind iff NERDTree is inactive, current buffer is modifiable
+" is not vimdiff
+" Else just toggles it off
+function! SyncTree()
+  if &modifiable && !IsNERDTreeOpen() && strlen(expand('%')) > 0 && !&diff
+    NERDTreeFind
+  else
+    NERDTreeToggle
+  endif
+endfunction
+
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " User setting
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -351,8 +367,10 @@ if has_fzf_suite > 0
 endif
 
 " toggle and untoggle Nerdtree
-nnoremap    <silent><leader>nt      :NERDTreeToggle<CR>
-inoremap    <silent><leader>nt <Esc>:NERDTreeToggle<CR>a
+nnoremap    <silent><leader>nt      :call SyncTree()<CR>
+inoremap    <silent><leader>nt <Esc>:call SyncTree()<CR>a
+nnoremap    <silent><leader>re      :NERDTreeFind<CR>
+inoremap    <silent><leader>re <Esc>:NERDTreeFind<CR>a
 " Toggles tagbar
 map         <silent><leader>tb      :TagbarToggle<CR>
 " Shows the change history
@@ -398,7 +416,9 @@ nnoremap <silent> <leader>tw
     \ endif<CR>
 
 " Deletes trailing whitespace in current line
-nnoremap <silent><leader>ds :s/\s\+$//ge<CR>
+nnoremap <silent>ds :s/\s\+$//ge<CR>
+" Deletes all trailing whitespace
+nnoremap <silent>da :let _s=@/ <Bar> :%s/\s\+$//e <Bar> :let @/=_s <Bar> :nohl <Bar> :unlet _s <CR>
 
 " Toggles word under cursor matching
 hi SearchPattern ctermbg=LightYellow guibg=LightYellow
@@ -445,7 +465,7 @@ nnoremap    <Del>       "_d<Right>
 "=============================================
 " autocompletes braces
 inoremap    {           {}<Left>
-inoremap    {<CR>       {<CR>}<Up>
+inoremap    {<CR>       {<CR>}<Left>
 inoremap    {{          {
 inoremap    {}          {}
 
@@ -470,7 +490,7 @@ nnoremap    <C-l>       <C-w>l
 " Create and delete tabs
 nnoremap    <C-t>       :tabnew<CR>
 nnoremap    <C-e>       :confirm bdelete<CR>
-
+nnoremap    <leader>e   :tabclose<CR> 
 " Switch tabs
 nnoremap    L           gt
 nnoremap    H           gT

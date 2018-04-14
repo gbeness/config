@@ -31,3 +31,5 @@
 	tool = meld
 [merge]
     tool = meld
+[core]
+	excludesfile = /home/ahuh/.gitignore_global
