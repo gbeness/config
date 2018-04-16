@@ -2,7 +2,7 @@ from bs4 import BeautifulSoup
 import requests
 import datetime
 from dateutil.relativedelta import *
-
+import Singleton
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
@@ -10,43 +10,60 @@ from email.mime.text import MIMEText
 WEEKS_TO_CHECK = 1
 DAYS_IN_WEEK = 7
 listOfRecipients = ['gbeness@umich.edu']
-
-class httpPollerObj(object):
-    def __init__(self, url, payload, siteInfo):
-        self.urlStr = url
-        self.payload = payload
-        self.infoStr = siteInfo
+''' 
+Things to do:
+*create a singleton library 
+	-email server shall be a singleton object
+	-all htmlobject will have a handle on the same object but 
+	-not duplicate
+*better email message
+* maybe make libraries so that it is not as confusing to have all in one file
+*should be a parse method
+* should be way to parse entire campground even if there are multiple pages for it
+* if there are ltos of hits for a given campground, dont want spam so condense email
+'''
+@Singleton.Singleton
+class emailClient():
+    def __init__(self):
         self.senderAddr = 'camping.notification@gmail.com'
         self.password = 'WildAndFree!' 
         self.smtp = smtplib.SMTP(host='smtp.gmail.com', port=587)
         self.smtp.starttls()
         self.smtp.login(self.senderAddr, self.password)
+
+    def sendEmail(self, recipient, subject, message):
+        msg = MIMEMultipart('alternative')
+	msg['From'] = self.senderAddr
+	msg['To'] = recipient
+	msg['Subject'] = subject 
+	msg.attach(MIMEText(message, 'html'))
+	self.smtp.sendmail(self.senderAddr, recipient, msg.as_string())
+
+class httpRequestObj(object):
+    def __init__(self, url, payload, siteInfo):
+        self.urlStr = url
+        self.payload = payload
+        self.infoStr = siteInfo
         
         self.availableDates = []
         self.availableSite = []
 
-    def sendNotificationEmail(self, listOfRecipients):
+	self.emailClient = emailClient.instance()
+
+    def sendNotificationEmail(self, listOfRecipients, date):
         for recipient in listOfRecipients:
-            msg = MIMEMultipart('alternative')
 
             # add in the actual person name to the message template
             message =  """\
-                    Good news! There is a new availablitity %s<br \> \
-                    Grab it quick while it is still available'\
-                    <a href="%s">abc</a>
-                    """ % (self.infoStr, self.urlStr)
+                    Good news! There is a new availablitity at %s in %s<br \> \
+                    Grab it quick while it is still available \
+                    <a href="%s">link</a>
+                    """ % (self.infoStr, self.parkName, self.urlStr)
 
-            # setup the parameters of the message
-            msg['From'] = self.senderAddr
-            msg['To'] = recipient
-            msg['Subject'] = '[Notification] New Opening Now Available'
-
-            # add in the message body
-            #msg.attach(MIMEText(message, 'plain'))
-            msg.attach(MIMEText(message, 'html'))
+            subject = '[Notification] New Opening In %s' % self.parkName
 
             # send the message via the server set up earlier.
-            self.smtp.sendmail(self.senderAddr, recipient, msg.as_string())
+	    self.emailClient.sendEmail(recipient, subject, message)
 
     def query(self):
         r = requests.get(self.urlStr.rstrip(), params=self.payload)
@@ -67,9 +84,9 @@ class httpPollerObj(object):
             soup = BeautifulSoup(resp.text, 'html.parser')
             #print(soup.prettify())
             t = soup.find_all('div', 'loopName')
-            self.sendNotificationEmail(listOfRecipients)
+            self.sendNotificationEmail(listOfRecipients, date)
 
-    # Returns a list of the next 4 fridays
+    # Returns a list of the next 4 *day
     def getNextValidDates(self, day):
         list = []
         currentDate = datetime.datetime.now()
@@ -83,8 +100,9 @@ class httpPollerObj(object):
 
 
 
-class joshuaTree(httpPollerObj) :
+class joshuaTree(httpRequestObj) :
     def __init__(self, parkId, siteInfo):
+	self.parkName = 'Joshua Tree National Park'
         jTreeBaseUrl = 'https://www.recreation.gov/campsiteCalendar.do'
         payload = {'page': 'calendar', 'contractCode': 'NRSO', 'parkId':parkId, 'sitepage':'true', 'startidx':'0'}
         super(joshuaTree, self).__init__(jTreeBaseUrl, payload, siteInfo)
