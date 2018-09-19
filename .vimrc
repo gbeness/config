@@ -87,8 +87,13 @@ call plug#begin()
     " A better way of 'marking' aka file bookmarks.
     Plug 'MattesGroeger/vim-bookmarks'
 
-    Plug 'git@github.com:gbeness/substitution_nerdtree.git'
-    Plug 'git@github.com:gbeness/grep_nerdtree.git'
+
+    " Shows a 's'ubstitution menu item for nerdtree, for find-and-replace on a folder.
+    Plug 'https://bitbucket.org/rmoe88/substitution_menuitem.git'
+
+    " Shows a 'g'rep menu item for nerdtree, for searching on a folder.
+    Plug 'https://bitbucket.org/rmoe88/grep_menuitem.git'
+    Plug 'https://bitbucket.org/rmoe88/ycm_json_menuitem.git'
 call plug#end()
 
 " Don't highlight any executables in NERDTree.
@@ -96,6 +101,7 @@ highlight link NERDTreeExecFile ModeMsg
 
 let g:ycm_global_ycm_extra_conf = '~/.vim/.ycm_extra_conf.py'
 let g:ycm_collect_identifiers_from_tags_files = 1
+
 " cpp enhanced highlight
 let g:cpp_class_scope_highlight = 1
 let g:cpp_member_variable_highlight = 1
@@ -113,21 +119,6 @@ let g:NERDTreeDirArrowCollapsible = '▾'
 let g:NERDTreeGlyphReadOnly = "RO"
 let g:NERDTreeShowHidden = 1
 
-" Check if NERDTree is open or active
-function! IsNERDTreeOpen()        
-  return exists("t:NERDTreeBufName") && (bufwinnr(t:NERDTreeBufName) != -1)
-endfunction
-
-" Call NERDTreeFind iff NERDTree is inactive, current buffer is modifiable
-" is not vimdiff
-" Else just toggles it off
-function! SyncTree()
-  if &modifiable && !IsNERDTreeOpen() && strlen(expand('%')) > 0 && !&diff
-    NERDTreeFind
-  else
-    NERDTreeToggle
-  endif
-endfunction
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " User setting
@@ -171,7 +162,7 @@ endif
 if vim_version >= 704
     set fileignorecase
 endif
-autocmd BufEnter *.tpp :setlocal filetype=cpp 
+autocmd BufEnter *.tpp :setlocal filetype=cpp
 
 "=============================================
 " Searches/Autocomplete and highlighting
@@ -244,7 +235,7 @@ set cindent
 set cinoptions=g-1
 " Shows tabs when using tab indentation.
 " Note: Do not remove the space at the end of the command
-set list lcs=tab:\|\ 
+set list lcs=tab:\|\
 
 "=============================================
 " Line related
@@ -273,7 +264,7 @@ set cmdheight=1
 " show the to-be-completed command in the status line.
 set showcmd
 " Some setting haven't looked into
-set statusline=%<%f\ %h%m%r%y%=%-20.(%l/%L,%c%V%)\ %P
+set statusline=%<%F\ %h%m%r%y%=%-20.(%l/%L,%c%V%)\ %P
 
 "=============================================
 " Copy/Paste
@@ -281,27 +272,6 @@ set statusline=%<%f\ %h%m%r%y%=%-20.(%l/%L,%c%V%)\ %P
 " Use linux system clipboard instead of VIMs
 " https://stackoverflow.com/questions/3961859/how-to-copy-to-clipboard-invim
 set clipboard=unnamedplus
-
-" Automatically paste from the system clipboard
-" no more needing to ':set paste' before you paste:
-" https://coderwall.com/p/if9mda/automatically-set-paste-mode-in-vim-when-pasting-in-insert-mode
-function! WrapForTmux(s)
-    if !exists('$TMUX')
-        return a:s
-    endif
-    let tmux_start = "\<Esc>Ptmux;"
-    let tmux_end = "\<Esc>\\"
-    return tmux_start . substitute(a:s, "\<Esc>", "\<Esc>\<Esc>", 'g') . tmux_end
-endfunction
-let &t_SI .= WrapForTmux("\<Esc>[?2004h")
-let &t_EI .= WrapForTmux("\<Esc>[?2004l")
-function! XTermPasteBegin()
-    set pastetoggle=<Esc>[201~
-    set paste
-    return ""
-endfunction
-inoremap <special> <expr> <Esc>[200~ XTermPasteBegin()
-
 
 "=============================================
 " Misc Settings
@@ -333,29 +303,31 @@ if has_fzf_suite == 0
     command! -nargs=* Gblame call s:GitBlame()
 endif
 
-" --- :FunctionName ---
-command! -nargs=* FunctionName call ShowFunctionName()
-
 " --- :Buffers ---
 " Use this if the fzf Buffers command is not available.
 if has_fzf_suite == 0
-    command! Buffers call setqflist(map(filter(range(1, bufnr('$')), 'buflisted(v:val)'), '{"bufnr":v:val}')) | copen | execute ':redraw!'
+    command! Buffers call setqflist(map(filter(range(1, bufnr('$')), 'buflisted(v:val)'), '{"bufnr":v:val}')) 
+    \  | copen 
+    \  | execute ':redraw!'
 endif
 
 " --- Grep Commands ---
 " opens search results in a window w/ links and highlight the matches, for the word under the cursor
-command! -nargs=+ GrepC :execute  'silent grep -Rin --include=\*.{c,cc,cpp,tpp,cxx,h,hpp,hxx} . -e <args>' | copen | execute ':redraw!'
-command! -nargs=+ FindC :execute  'silent grep -Rinl --include=\*.{c,cc,cpp,tpp,cxx,h,hpp,hxx} . -e <args>' | copen | execute ':redraw!'
-command! -nargs=+ Grep  :execute  'silent grep -RIin . -e <args>' | copen | execute ':redraw!'
-command! -nargs=+ Find  :execute  'silent grep -RIinl . -e <args>' | copen | execute ':redraw!'
+command! -nargs=+ GrepC :execute  'silent grep! -Rin --include=\*.{c,cc,cpp,tpp,cxx,h,hpp,hxx} . -e <args>' 
+    \                   | copen 
+    \                   | execute ':redraw!'
 
-" --- :W ---
-" will SUDO save the file
+command! -nargs=+ Grep  :execute  'silent grep! -RIin . -e <args>' | copen | execute ':Shell redraw'
+"
+" --- Ag Commands ---
+command! -bang -nargs=* Ag 
+    \                       call fzf#vim#ag(<q-args>, 
+    \                       <bang>0 ? fzf#vim#with_preview('up:60%')
+    \                       : fzf#vim#with_preview('right:50%:hidden', '?'),
+    \                       <bang>0)
+"
+" --- :W (sudo save)---
 command W w !sudo tee % > /dev/null
-
-" --- :VReplace ---
-" WIP
-"command! -nargs=* VReplace :"hy:%s/<C-r>h//gc<left><left><left>
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Custom leader mapping
@@ -380,26 +352,25 @@ nmap        <silent><leader>gb      :Gblame<CR>
 nmap        <silent><leader>jt      <Plug>GitGutterNextHunk
 nmap        <silent><leader>jT      <Plug>GitGutterPrevHunk
 
-"if has_fzf_suite > 0
-"    map <F5> :GFiles?<CR>
-"endif
+nmap        <silent><leader>GC      :GrepC <c-r>=expand("<cword>")<cr><cr>
+nnoremap    <silent><leader>ag      :Ag <c-r>=expand("<cword>")<cr><cr>
 
 " clang-format, for file formatting auto-correction.
 "map         <F9>        :pyf ~/bin/clang-format.py<cr>
 "imap        <F9>        <c-o>:pyf ~/bin/clang-format.py<cr>
 
-" will regenerate a tag filea
-map         <silent><leader>tag     :!find . -type f -name '*.cpp' -o -name '*.c' 
-                                                                  \-o -name '*.cxx' 
-                                                                  \-o -name '*.h' 
-                                                                  \-o -name '*.hpp' 
-                                                                  \-o -name '*.hxx' 
-                                                                  \-o -name '*.cc' 
-                                                                  \-o -name '*.py' 
-                                                                  \-o -name '*.sh' 
-                                                                  \\| ctags -L - 
-                                                                  \--c++-kinds=+p 
-                                                                  \--fields=+liaS 
+" will regenerate a tag file
+map         <silent><leader>tag     :!find . -type f -name '*.cpp' -o -name '*.c'
+                                                                  \-o -name '*.cxx'
+                                                                  \-o -name '*.h'
+                                                                  \-o -name '*.hpp'
+                                                                  \-o -name '*.hxx'
+                                                                  \-o -name '*.cc'
+                                                                  \-o -name '*.py'
+                                                                  \-o -name '*.sh'
+                                                                  \\| ctags -L -
+                                                                  \--c++-kinds=+p
+                                                                  \--fields=+liaS
                                                                   \--extra=+q<CR><CR>
 
 
@@ -439,14 +410,15 @@ nnoremap    <C-s>       :%s/\<<C-r><C-w>\>//gc<Left><Left><Left>
 " In visual mode, highlighted word is selected for replacement
 vnoremap    <C-s>       "hy:%s/<C-r>h//gc<Left><Left><Left>
 
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" WIP
 " YouCompleteMe jumping function
 if has_ycm > 0
     nnoremap <C-p>      :YcmCompleter GoToDefinitionElseDeclaration<CR>
 endif
 " CTags, using ctags generated with f12.
-map         <C-p><C-p> <c-]>
-" Custom GREP search results, Third level of Ctrl-p-p-p.
-nmap        <C-p><C-p><C-p> :GrepC <c-r>=expand("<cword>")<cr><cr>
+map         <C-p><C-p>  <c-]>
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 "=============================================
 " Misc keys
@@ -455,17 +427,17 @@ nmap        <C-p><C-p><C-p> :GrepC <c-r>=expand("<cword>")<cr><cr>
 map         0           ^
 map         -           $
 
-" delete remapped to df
-nmap        df          <Del>
 " Stop delete from putting the deleted text into the clipboard
 nnoremap    d           "_d
+nnoremap    x           "_d<Right>
 nnoremap    <Del>       "_d<Right>
+
 "=============================================
 " Braces
 "=============================================
 " autocompletes braces
 inoremap    {           {}<Left>
-inoremap    {<CR>       {<CR>}<Left>
+inoremap    {<CR>       {<CR>}<C-o>O
 inoremap    {{          {
 inoremap    {}          {}
 
@@ -490,10 +462,13 @@ nnoremap    <C-l>       <C-w>l
 " Create and delete tabs
 nnoremap    <C-t>       :tabnew<CR>
 nnoremap    <C-e>       :confirm bdelete<CR>
-nnoremap    <leader>e   :tabclose<CR> 
+nnoremap    <leader>e   :tabclose<CR>
 " Switch tabs
 nnoremap    L           gt
 nnoremap    H           gT
+" Moves tabs over
+nnoremap    <leader>=   :tabm +1<CR>
+nnoremap    <leader>-   :tabm -1<CR>
 
 " Maps to nothing
 nnoremap    K           <Nop>
@@ -501,9 +476,25 @@ nnoremap    J           <Nop>
 vnoremap    K           <Nop>
 vnoremap    J           <Nop>
 
+" Navigation in command-line : 
+cnoremap    <C-A>       <Home>
+cnoremap    <C-j>       <Down>
+cnoremap    <C-k>       <Up>
+cnoremap    <C-h>       <Left>
+cnoremap    <C-l>       <Right>
+
+
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Multi-Use Functions
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"======================================================
+" Shows the name of the function that cursor is scoped within
+"======================================================
+" Gets the current function name and puts it in a VIM var.
+fun! GetFuncName()
+  let g:functionName = getline(search("^[^ \t#/]\\{2}.*[^:]\s*$", 'bWn'))
+endfun
+
 " Show the current function you are in right below the status bar
 fun! ShowFunctionName()
     echohl ModeMsg
@@ -532,19 +523,22 @@ endfunction
 
 "======================================================
 " http://vim.wikia.com/wiki/Prevent_frequent_commands_from_slowing_things_down
-" Returns true if at least delay seconds have elapsed since the last time this function was called, based on the time
-" contained in the variable "timer". The first time it is called, the variable is defined and the function returns
-" true.
-" For example, to execute something no more than once every two seconds using a variable named "b:myTimer", do this:
+" Returns true if at least delay seconds have elapsed since the last time this
+" function was called, based on the time contained in the variable "timer".
+" The first time it is called, the variable is defined and function returns true
+"
+" i.e, to execute no more than once every two seconds using var "b:myTimer":
 " if LongEnough( "b:myTimer", 2 )
 "   <do the thing>
 " endif
-" The optional 3rd parameter is the number of times to suppress the operation within the specified time and then let it
-" happen even though the required delay hasn't happened. For example:
+"
+" The optional 3rd param is the number of times to suppress the operation within
+" the specified time and then let it happen even though the required delay hasn't
+" happened. i.e:
 " if LongEnough( "b:myTimer", 2, 5 )
 "   <do the thing>
 " endif
-" Means to execute either every 2 seconds or every 5 calls, whichever happens first.
+" Means to execute either every 2 seconds or every 5 calls, whichever happens first
 "======================================================
 function! LongEnough( timer, delay, ... )
     let result = 0
@@ -562,8 +556,8 @@ function! LongEnough( timer, delay, ... )
             let result = 1
         elseif ( suppressionCount > 0 )
             let {a:timer}_callCount += 1
-            " It hasn't been a while, but the number of times we have been called has hit the suppression limit, so we activate
-            " anyway.
+            " It hasn't been a while, but the number of times function has been called
+            " has hit threshold, result == true
             if ( {a:timer}_callCount >= suppressionCount )
                 let result = 1
             endif
@@ -575,4 +569,48 @@ function! LongEnough( timer, delay, ... )
         let {a:timer}_callCount = 0
     endif
     return result
+endfunction
+
+"======================================================
+" Automatically paste from the system clipboard
+" no more needing to ':set paste' before you paste:
+" https://coderwall.com/p/if9mda/automatically-set-paste-mode-in-vim-when-pasting-in-insert-mode
+"======================================================
+function! WrapForTmux(s)
+    if !exists('$TMUX')
+        return a:s
+    endif
+    let tmux_start = "\<Esc>Ptmux;"
+    let tmux_end = "\<Esc>\\"
+    return tmux_start . substitute(a:s, "\<Esc>", "\<Esc>\<Esc>", 'g') . tmux_end
+endfunction
+
+let &t_SI .= WrapForTmux("\<Esc>[?2004h")
+let &t_EI .= WrapForTmux("\<Esc>[?2004l")
+
+function! XTermPasteBegin()
+    set pastetoggle=<Esc>[201~
+    set paste
+    return ""
+endfunction
+
+inoremap <special> <expr> <Esc>[200~ XTermPasteBegin()
+
+"======================================================
+" NERDTree related function definitions
+"======================================================
+" Check if NERDTree is open or active
+function! IsNERDTreeOpen()
+  return exists("t:NERDTreeBufName") && (bufwinnr(t:NERDTreeBufName) != -1)
+endfunction
+
+" Call NERDTreeFind iff NERDTree is inactive, current buffer is modifiable
+" is not vimdiff
+" Else just toggles it off
+function! SyncTree()
+  if &modifiable && !IsNERDTreeOpen() && strlen(expand('%')) > 0 && !&diff
+    NERDTreeFind
+  else
+    NERDTreeToggle
+  endif
 endfunction
