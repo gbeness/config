@@ -96,10 +96,17 @@ call plug#begin()
     Plug 'https://bitbucket.org/rmoe88/ycm_json_menuitem.git'
 call plug#end()
 
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" User setting
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"=============================================
+" Globals
+"=============================================
 " Don't highlight any executables in NERDTree.
 highlight link NERDTreeExecFile ModeMsg
 
-let g:ycm_global_ycm_extra_conf = '~/.vim/.ycm_extra_conf.py'
+"let g:ycm_global_ycm_extra_conf = '~/.vim/.ycm_extra_conf.py'
 let g:ycm_collect_identifiers_from_tags_files = 1
 
 " cpp enhanced highlight
@@ -119,12 +126,8 @@ let g:NERDTreeDirArrowCollapsible = '▾'
 let g:NERDTreeGlyphReadOnly = "RO"
 let g:NERDTreeShowHidden = 1
 
-
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" User setting
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 "=============================================
-" Filesystem and other Settings
+" filesystem and other settings
 "=============================================
 " Enable filetype detection
 filetype on
@@ -180,7 +183,7 @@ set magic
 " This is the command auto-completion bar that appears
 set wildmenu
 " Autocomplete menu color seting
-highlight Pmenu ctermbg=52 ctermfg=lightyellow
+hi Pmenu cterm=NONE ctermfg=Grey ctermbg=DarkGrey
 
 " Make ENTER accept a YouCompleteMe suggestion, but also work reguarly everywhere else.
 " I also slightly modified the code from the website below to actually work on my vim setup.
@@ -190,7 +193,7 @@ imap <expr> <CR> pumvisible() ? "<c-y>" : "<CR>"
 " Auto highlight every word under the mouse curser.
 " http://stackoverflow.com/questions/1551231/highlight-variable-under-cursor-in-vim-like-in-netbeans
 " To see all highlight colors available, run the following :so $VIMRUNTIME/syntax/hitest.vim
-autocmd CursorHold * exe printf('match IncSearch /\V\<%s\>/', escape(expand('<cword>'), '/\'))
+autocmd CursorHold * exe printf('match DiffChange /\V\<%s\>/', escape(expand('<cword>'), '/\'))
 
 " This underlines the entire current line that the cursor is on, but only in Normal mode.
 " http://vim.wikia.com/wiki/Highlight_current_line
@@ -214,7 +217,7 @@ endif
 " https://github.com/flazz/vim-colorschemes/tree/master/colors
 colorscheme despacio
 " Highlight Search
-hi Search ctermbg=LightYellow guibg=LightYellow
+hi Search cterm=NONE ctermfg=Yellow ctermbg=DarkGrey
 
 "=============================================
 " Text, tab and indent related
@@ -320,8 +323,7 @@ command! -nargs=+ GrepC :execute  'silent grep! -Rin --include=\*.{c,cc,cpp,tpp,
 command! -nargs=+ Grep  :execute  'silent grep! -RIin . -e <args>' | copen | execute ':Shell redraw'
 "
 " --- Ag Commands ---
-command! -bang -nargs=* Ag 
-    \                       call fzf#vim#ag(<q-args>, 
+command! -bang -nargs=* Ag  call fzf#vim#ag(<q-args>, 
     \                       <bang>0 ? fzf#vim#with_preview('up:60%')
     \                       : fzf#vim#with_preview('right:50%:hidden', '?'),
     \                       <bang>0)
@@ -392,7 +394,7 @@ nnoremap <silent>ds :s/\s\+$//ge<CR>
 nnoremap <silent>da :let _s=@/ <Bar> :%s/\s\+$//e <Bar> :let @/=_s <Bar> :nohl <Bar> :unlet _s <CR>
 
 " Toggles word under cursor matching
-hi SearchPattern ctermbg=LightYellow guibg=LightYellow
+hi SearchPattern cterm=NONE ctermfg=Yellow ctermbg=Grey
 nnoremap <silent> <leader>m
     \ :if exists('w:pattern_match') <Bar>
     \   silent! call matchdelete(w:pattern_match) <Bar>
@@ -426,7 +428,8 @@ map         <C-p><C-p>  <c-]>
 " Remap VIM 0 to first non-blank character in a line.
 map         0           ^
 map         -           $
-
+" Stop search jumps 
+nnoremap    *           :let @/='\<<C-R>=expand("<cword>")<CR>\>'<CR>:set hls<CR>
 " Stop delete from putting the deleted text into the clipboard
 nnoremap    d           "_d
 nnoremap    x           "_d<Right>
@@ -476,7 +479,7 @@ nnoremap    J           <Nop>
 vnoremap    K           <Nop>
 vnoremap    J           <Nop>
 
-" Navigation in command-line : 
+" Navigation in command-line
 cnoremap    <C-A>       <Home>
 cnoremap    <C-j>       <Down>
 cnoremap    <C-k>       <Up>
