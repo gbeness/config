@@ -28,6 +28,7 @@
 	tool = meld
 [core]
 	excludesfile = /home/ahuh/.gitignore_global
+	autocrlf = false
 [mergetool]
 	prompt = false
 [filter "lfs"]

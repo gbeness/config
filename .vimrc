@@ -126,6 +126,34 @@ let g:NERDTreeDirArrowCollapsible = '▾'
 let g:NERDTreeGlyphReadOnly = "RO"
 let g:NERDTreeShowHidden = 1
 
+let g:fzf_layout = { 'down': '~100%' }
+let g:fzf_commits_log_options = '--graph --color=always --all --decorate'
+let g:fzf_colors = {
+      \ 'fg':      ['fg', ''],
+      \ 'bg':      ['bg', 'Normal'],
+      \ 'hl':      ['fg', ''],
+      \ 'fg+':     ['fg', '', '', ''],
+      \ 'bg+':     ['bg', '', ''],
+      \ 'hl+':     ['fg', ''],
+      \ 'info':    ['fg', ''],
+      \ 'prompt':  ['fg', ''],
+      \ 'pointer': ['fg', 'String'],
+      \ 'marker':  ['fg', ''],
+      \ 'spinner': ['fg', ''],
+      \ 'header':  ['fg', 'ErrorMsg'] }
+"
+"
+" fg is foreground or font color
+" bg is background
+" hl is for additional typing and filtering
+" hl+ is when cursor is on it
+" info is the number of hits field
+" pointer is the >
+" prompt is the very bottom ie Commands>
+" header is the columns information
+" spinner - not sure
+"
+
 "=============================================
 " filesystem and other settings
 "=============================================
@@ -150,7 +178,8 @@ set nowb
 " No .swp file
 set noswapfile
 " Use Unix as the standard file type
-set ffs=unix,dos,mac
+set ffs=unix,dos
+set fileformat=unix
 " Set utf8 as standard encoding and en_US as the standard language
 set encoding=utf8
 " Return to last edit position when opening files (You want this!)
@@ -182,8 +211,6 @@ set incsearch
 set magic
 " This is the command auto-completion bar that appears
 set wildmenu
-" Autocomplete menu color seting
-hi Pmenu cterm=NONE ctermfg=Grey ctermbg=DarkGrey
 
 " Make ENTER accept a YouCompleteMe suggestion, but also work reguarly everywhere else.
 " I also slightly modified the code from the website below to actually work on my vim setup.
@@ -214,10 +241,10 @@ else
     set term=xterm-256color
 endif
 
-" https://github.com/flazz/vim-colorschemes/tree/master/colors
-colorscheme despacio
-" Highlight Search
-hi Search cterm=NONE ctermfg=Yellow ctermbg=DarkGrey
+colorscheme pasta
+
+" Compile Error/Warnings colors
+hi def link YcmErrorSection DiffDelete
 
 "=============================================
 " Text, tab and indent related
@@ -255,7 +282,9 @@ set whichwrap+=<,>,h,l,[,],
 " Line number on the side
 set number
 " Number of lines cursor moves before scrolling
-set so=20
+set so=30
+
+set cursorcolumn 
 
 "=============================================
 " Status line
@@ -309,37 +338,59 @@ endif
 " --- :Buffers ---
 " Use this if the fzf Buffers command is not available.
 if has_fzf_suite == 0
-    command! Buffers call setqflist(map(filter(range(1, bufnr('$')), 'buflisted(v:val)'), '{"bufnr":v:val}')) 
-    \  | copen 
+    command! Buffers call setqflist(map(filter(range(1, bufnr('$')), 'buflisted(v:val)'), '{"bufnr":v:val}'))
+    \  | copen
     \  | execute ':redraw!'
 endif
 
 " --- Grep Commands ---
 " opens search results in a window w/ links and highlight the matches, for the word under the cursor
-command! -nargs=+ GrepC :execute  'silent grep! -Rin --include=\*.{c,cc,cpp,tpp,cxx,h,hpp,hxx} . -e <args>' 
-    \                   | copen 
+command! -nargs=+ GrepC :execute  'silent grep! -Rin --include=\*.{c,cc,cpp,tpp,cxx,h,hpp,hxx} . -e <args>'
+    \                   | copen
     \                   | execute ':redraw!'
 
-command! -nargs=+ Grep  :execute  'silent grep! -RIin . -e <args>' | copen | execute ':Shell redraw'
-"
-" --- Ag Commands ---
-command! -bang -nargs=* Ag  call fzf#vim#ag(<q-args>, 
-    \                       <bang>0 ? fzf#vim#with_preview('up:60%')
-    \                       : fzf#vim#with_preview('right:50%:hidden', '?'),
-    \                       <bang>0)
-"
+command! -nargs=+ Grep  :execute  'silent grep! -rIin <args>' | copen | execute ':redraw!'
+
+" --- fzf Commands
+" Raw Ag, which allows for additional args
+" Needs work on the coloring
+command! -bang -nargs=* Rag
+    \ call fzf#vim#ag_raw('--color-path "35;4" --color-line-number "1;33" '.(<q-args>),
+    \                     <bang>0 ? fzf#vim#with_preview('up:100%')
+    \                             : fzf#vim#with_preview('up:50%:hidden', '?'),
+    \                     <bang>0)
+
+" Rip grep, customization of color is easier than Ag
+command! -bang -nargs=* Rg
+    \ call fzf#vim#grep(
+    \   'rg --column --line-number --no-heading --color=always --smart-case
+    \       --colors "path:fg:130,89,89"
+    \       --colors "line:fg:163,198,183"
+    \       --colors "match:fg:148,195,173" '.(<q-args>),
+    \   1,
+    \   <bang>0 ? fzf#vim#with_preview('up:100%')
+    \           : fzf#vim#with_preview('up:50%:hidden', '?'),
+    \   <bang>0)
+
+
+" fzf relating to git
+command! -bang -nargs=* GitFiles call fzf#vim#gitfiles('.', fzf#vim#with_preview('up'))
+
 " --- :W (sudo save)---
 command W w !sudo tee % > /dev/null
+
+" --- HEX hex representation
+if executable('xxd')
+    command! HEX :%!xxd
+        command! HEXSAVE :%!xxd -r
+    else
+        command! HEX :echo "External command xxd not found."
+            command! HEXSAVE :echo "External command xxd not found."
+endif
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Custom leader mapping
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" --- SpaceBar ---
-" Search though all commands available to you.  Very handy!
-if has_fzf_suite > 0
-    map     <space>                 :Commands<CR>
-endif
-
 " toggle and untoggle Nerdtree
 nnoremap    <silent><leader>nt      :call SyncTree()<CR>
 inoremap    <silent><leader>nt <Esc>:call SyncTree()<CR>a
@@ -349,35 +400,46 @@ inoremap    <silent><leader>re <Esc>:NERDTreeFind<CR>a
 map         <silent><leader>tb      :TagbarToggle<CR>
 " Shows the change history
 nmap        <silent><leader>gb      :Gblame<CR>
-
 " Jumps to git changes
 nmap        <silent><leader>jt      <Plug>GitGutterNextHunk
 nmap        <silent><leader>jT      <Plug>GitGutterPrevHunk
 
-nmap        <silent><leader>GC      :GrepC <c-r>=expand("<cword>")<cr><cr>
-nnoremap    <silent><leader>ag      :Ag <c-r>=expand("<cword>")<cr><cr>
-
+if has_fzf_suite > 0
+    " Searching with fzf
+    nnoremap    <silent><leader>ag      :let wordUnderCursor = expand("<cword>") <Bar>
+                                      \  let cwd = expand('%:p:h') <Bar>
+                                      \ :execute "Rag ". wordUnderCursor ." ". cwd <CR>
+    nnoremap    <silent><leader>rg      :let wordUnderCursor = expand("<cword>") <Bar>
+                                      \  let cwd = expand('%:p:h') <Bar>
+                                      \ :execute "Rg ". wordUnderCursor ." ". cwd <CR>
+    nnoremap    <silent><leader>gr      :let wordUnderCursor = expand("<cword>") <Bar>
+                                      \  let cwd = expand('%:p:h') <Bar>
+                                      \ :execute "Grep ". wordUnderCursor ." ". cwd<CR>
+    nmap        <silent><leader>gb      :Gblame<CR>
+    " git log
+    map         <silent><leader>lg      :Commits<CR>
+endif
 " clang-format, for file formatting auto-correction.
 "map         <F9>        :pyf ~/bin/clang-format.py<cr>
 "imap        <F9>        <c-o>:pyf ~/bin/clang-format.py<cr>
 
 " will regenerate a tag file
-map         <silent><leader>tag     :!find . -type f -name '*.cpp' -o -name '*.c'
-                                                                  \-o -name '*.cxx'
-                                                                  \-o -name '*.h'
-                                                                  \-o -name '*.hpp'
-                                                                  \-o -name '*.hxx'
-                                                                  \-o -name '*.cc'
-                                                                  \-o -name '*.py'
-                                                                  \-o -name '*.sh'
-                                                                  \\| ctags -L -
-                                                                  \--c++-kinds=+p
-                                                                  \--fields=+liaS
-                                                                  \--extra=+q<CR><CR>
-
+map         <silent><leader>tag     :!find . -type f -name '*.cpp'  -o -name '*.c'
+                                                                  \ -o -name '*.cxx'
+                                                                  \ -o -name '*.h'
+                                                                  \ -o -name '*.hpp'
+                                                                  \ -o -name '*.hxx'
+                                                                  \ -o -name '*.cc'
+                                                                  \ -o -name '*.py'
+                                                                  \ -o -name '*.sh'
+                                                                  \ \| ctags -L -
+                                                                  \ --c++-kinds=+p
+                                                                  \ --fields=+liaS
+                                                                  \ --extra=+q<CR><CR>
 
 " Toggles highlighting for trailing whitespaces
-highlight ExtraWhitespace ctermbg=lightred guibg=lightred
+"highlight ExtraWhitespace ctermbg=lightred guibg=lightred
+hi def link ExtraWhitespace DiffDelete
 nnoremap <silent> <leader>tw
     \ :if exists('w:trailing_whitespace_match') <Bar>
     \   silent! call matchdelete(w:trailing_whitespace_match) <Bar>
@@ -394,7 +456,8 @@ nnoremap <silent>ds :s/\s\+$//ge<CR>
 nnoremap <silent>da :let _s=@/ <Bar> :%s/\s\+$//e <Bar> :let @/=_s <Bar> :nohl <Bar> :unlet _s <CR>
 
 " Toggles word under cursor matching
-hi SearchPattern cterm=NONE ctermfg=Yellow ctermbg=Grey
+"hi SearchPattern cterm=NONE ctermfg=Yellow ctermbg=Grey
+hi def link SearchPattern DiffAdd
 nnoremap <silent> <leader>m
     \ :if exists('w:pattern_match') <Bar>
     \   silent! call matchdelete(w:pattern_match) <Bar>
@@ -408,9 +471,9 @@ nnoremap <silent> <leader>m
 " Show function name below status bar.  See function for more details.
 map         <C-f>       :call ShowFunctionName() <CR>
 " Substitution in command mode
-nnoremap    <C-s>       :%s/\<<C-r><C-w>\>//gc<Left><Left><Left>
+nnoremap    <C-s>       :%sno/\<<C-r><C-w>\>//gc<Left><Left><Left>
 " In visual mode, highlighted word is selected for replacement
-vnoremap    <C-s>       "hy:%s/<C-r>h//gc<Left><Left><Left>
+vnoremap    <C-s>       "hy:%sno/<C-r>h//gc<Left><Left><Left>
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " WIP
@@ -418,7 +481,7 @@ vnoremap    <C-s>       "hy:%s/<C-r>h//gc<Left><Left><Left>
 if has_ycm > 0
     nnoremap <C-p>      :YcmCompleter GoToDefinitionElseDeclaration<CR>
 endif
-" CTags, using ctags generated with f12.
+" CTags, using ctags generated with \tag
 map         <C-p><C-p>  <c-]>
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
@@ -428,7 +491,7 @@ map         <C-p><C-p>  <c-]>
 " Remap VIM 0 to first non-blank character in a line.
 map         0           ^
 map         -           $
-" Stop search jumps 
+" Stop search jumps
 nnoremap    *           :let @/='\<<C-R>=expand("<cword>")<CR>\>'<CR>:set hls<CR>
 " Stop delete from putting the deleted text into the clipboard
 nnoremap    d           "_d
@@ -480,6 +543,7 @@ vnoremap    K           <Nop>
 vnoremap    J           <Nop>
 
 " Navigation in command-line
+" Don't lihe this, its different from my other arrow keys
 cnoremap    <C-A>       <Home>
 cnoremap    <C-j>       <Down>
 cnoremap    <C-k>       <Up>
